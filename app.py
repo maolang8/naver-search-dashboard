@@ -399,14 +399,21 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
     min_text_len = st.session_state.get("min_text_len", 0)
     custom_stopwords_list = st.session_state.get("custom_stopwords_list", [])
     
-    tab_titles = ["🌐 통합 검색어 트렌드"] + [f"📂 {c}" for c in selected_categories] + ["📑 종합 분석 보고서", "📋 전체 Raw 데이터 & 내보내기"]
-    
-    tabs = st.tabs(tab_titles)
+    selected_view = st.selectbox(
+        "분석 화면 선택",
+        options=[
+            "통합 검색어 트렌드",
+            "애플리케이션별 분석",
+            "종합 분석 보고서",
+            "Raw 데이터 내보내기",
+        ],
+        label_visibility="collapsed",
+    )
 
     # ---------------------------------------------------------
     # TAB 0: 통합 검색어 트렌드
     # ---------------------------------------------------------
-    with tabs[0]:
+    if selected_view == "통합 검색어 트렌드":
         st.subheader("🗓️ 네이버 데이터랩 검색어 통합 트렌드 (Line Chart)")
         if not trend_df.empty:
             fig_trend = px.line(
@@ -516,15 +523,18 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
     # ---------------------------------------------------------
     # TAB 1~N: 선택한 카테고리별 세부 EDA 페이지 렌더링
     # ---------------------------------------------------------
-    for idx, c_name in enumerate(selected_categories):
-        with tabs[idx + 1]:
-            df_sub = combined_df[combined_df["카테고리명"] == c_name]
-            render_category_eda(df_sub, c_name, min_len=min_text_len, custom_stopwords=custom_stopwords_list)
+    elif selected_view == "애플리케이션별 분석":
+        c_name = st.selectbox(
+            "분석할 애플리케이션 선택",
+            options=selected_categories,
+        )
+        df_sub = combined_df[combined_df["카테고리명"] == c_name]
+        render_category_eda(df_sub, c_name, min_len=min_text_len, custom_stopwords=custom_stopwords_list)
 
     # ---------------------------------------------------------
     # TAB N+1: 종합 분석 보고서
     # ---------------------------------------------------------
-    with tabs[len(selected_categories) + 1]:
+    elif selected_view == "종합 분석 보고서":
         st.subheader("📑 자동 생성된 마켓 인사이트 종합 보고서")
         report_md = generate_summary_report(combined_df, trend_df, keywords_list)
         
@@ -541,7 +551,7 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
     # ---------------------------------------------------------
     # TAB N+2: 전체 Raw 데이터 & 다운로드
     # ---------------------------------------------------------
-    with tabs[len(selected_categories) + 2]:
+    elif selected_view == "Raw 데이터 내보내기":
         st.subheader("📄 수집 전체 Raw 데이터 및 데이터 내보내기")
         st.dataframe(combined_df, use_container_width=True)
         
