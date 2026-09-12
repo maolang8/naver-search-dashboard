@@ -12,6 +12,13 @@ from src.eda_utils import generate_summary_report
 
 load_dotenv()
 
+# 톤다운된 네이버 그린 기반 차트 팔레트
+NAVER_CHART_COLORS = [
+    "#527A5D", "#759685", "#809BAC", "#9DB2BE",
+    "#A8BEA3", "#C4D3C5", "#667F8F", "#DCE6DB",
+]
+px.defaults.color_discrete_sequence = NAVER_CHART_COLORS
+
 # Streamlit 페이지 기본 설정
 st.set_page_config(
     page_title="네이버 마켓 인사이트 EDA 대시보드",
@@ -24,21 +31,22 @@ st.set_page_config(
 st.markdown("""
 <style>
     :root {
-        --naver-green: #03C75A;
-        --naver-green-dark: #00A84D;
-        --naver-mint: #EAF9F0;
-        --ink: #121212;
-        --muted: #66706A;
-        --line: #E2E8E4;
-        --surface: #FFFFFF;
+        --naver-green: #69A97C;
+        --naver-green-dark: #437955;
+        --naver-mint: #E8F1E9;
+        --naver-pale: #F2F6F1;
+        --ink: #252A26;
+        --muted: #69716B;
+        --line: #D7E0D8;
+        --surface: #FCFDFC;
     }
 
     .stApp {
-        background: #F5F7F6;
+        background: #F6F7F4;
         color: var(--ink);
     }
     [data-testid="stHeader"] {
-        background: rgba(245, 247, 246, 0.88);
+        background: rgba(246, 247, 244, 0.9);
         backdrop-filter: blur(10px);
     }
     [data-testid="stMainBlockContainer"] {
@@ -47,7 +55,7 @@ st.markdown("""
         padding-bottom: 4rem;
     }
     [data-testid="stSidebar"] {
-        background: #FFFFFF;
+        background: #FDFEFC;
         border-right: 1px solid var(--line);
     }
     [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1,
@@ -103,10 +111,10 @@ st.markdown("""
     }
     .hero-tag {
         padding: .36rem .68rem;
-        border: 1px solid #CDEDD9;
+        border: 1px solid #BDD3C2;
         border-radius: 999px;
-        background: rgba(255,255,255,.76);
-        color: #247345;
+        background: #EFF5EF;
+        color: #466E52;
         font-size: .76rem;
         font-weight: 650;
     }
@@ -117,13 +125,13 @@ st.markdown("""
         background: var(--naver-green) !important;
         color: white !important;
         font-weight: 750;
-        box-shadow: 0 6px 16px rgba(3, 199, 90, .2);
+        box-shadow: 0 6px 16px rgba(67, 121, 85, .16);
         transition: transform .15s ease, box-shadow .15s ease;
     }
     .stButton > button[kind="primary"]:hover {
         background: var(--naver-green-dark) !important;
         transform: translateY(-1px);
-        box-shadow: 0 9px 22px rgba(3, 199, 90, .26);
+        box-shadow: 0 9px 22px rgba(67, 121, 85, .22);
     }
     div[data-baseweb="input"],
     div[data-baseweb="select"] > div,
@@ -131,7 +139,7 @@ st.markdown("""
         border: 1px solid var(--naver-green) !important;
         border-radius: 9px !important;
         background: #FFFFFF !important;
-        box-shadow: 0 0 0 1px rgba(3, 199, 90, .08) !important;
+        box-shadow: 0 0 0 1px rgba(67, 121, 85, .08) !important;
     }
     div[data-baseweb="input"]:hover,
     div[data-baseweb="select"] > div:hover,
@@ -140,12 +148,12 @@ st.markdown("""
     div[data-baseweb="select"] > div:focus-within,
     div[data-baseweb="textarea"]:focus-within {
         border: 1px solid var(--naver-green) !important;
-        box-shadow: 0 0 0 2px rgba(3, 199, 90, .18) !important;
+        box-shadow: 0 0 0 2px rgba(67, 121, 85, .16) !important;
     }
     span[data-baseweb="tag"] {
         border: 1px solid var(--naver-green-dark) !important;
         border-radius: 8px !important;
-        background: var(--naver-green) !important;
+        background: #6FA77E !important;
         color: #FFFFFF !important;
         font-weight: 700;
     }
@@ -160,7 +168,7 @@ st.markdown("""
         border-top: 3px solid var(--naver-green);
         border-radius: 12px;
         background: var(--surface);
-        box-shadow: 0 5px 18px rgba(27, 45, 35, .04);
+        box-shadow: 0 5px 18px rgba(46, 68, 52, .04);
     }
     [data-testid="stMetricLabel"] { color: var(--muted); }
     [data-testid="stMetricValue"] { color: var(--ink); font-weight: 800; }
@@ -169,7 +177,7 @@ st.markdown("""
         padding: .3rem;
         border: 1px solid var(--line);
         border-radius: 11px;
-        background: white;
+        background: var(--surface);
     }
     .stTabs [data-baseweb="tab"] {
         height: 2.55rem;
@@ -186,8 +194,8 @@ st.markdown("""
         overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 14px;
-        background: white;
-        box-shadow: 0 6px 20px rgba(27, 45, 35, .04);
+        background: var(--surface);
+        box-shadow: 0 6px 20px rgba(46, 68, 52, .04);
     }
     [data-testid="stExpander"],
     [data-testid="stAlert"],
@@ -406,6 +414,7 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
                 x="날짜",
                 y="상대적 검색량",
                 color="검색어",
+                color_discrete_sequence=NAVER_CHART_COLORS,
                 title=f"검색어별 상대적 검색량 추이 ({start_date_str} ~ {end_date_str})",
                 markers=True,
                 template="plotly_white"
@@ -424,6 +433,7 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
                 x="카테고리명",
                 y="수집건수",
                 color="검색어",
+                color_discrete_sequence=NAVER_CHART_COLORS,
                 barmode="group",
                 title="카테고리 및 검색어별 데이터 수집 건수",
                 template="plotly_white"
@@ -437,6 +447,7 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
                 x="검색어",
                 y="총 수집건수",
                 color="검색어",
+                color_discrete_sequence=NAVER_CHART_COLORS,
                 text="총 수집건수",
                 title="검색어별 총 데이터 수집량 비교 (Bar Chart)",
                 template="plotly_white"

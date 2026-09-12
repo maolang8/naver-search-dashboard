@@ -14,6 +14,11 @@ from src.eda_utils import (
     compute_domain_pivot
 )
 
+CHART_COLORS = [
+    "#527A5D", "#759685", "#809BAC", "#9DB2BE",
+    "#A8BEA3", "#C4D3C5", "#667F8F", "#DCE6DB",
+]
+
 def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None):
     st.header(f"📌 {category_name} 세부 EDA 및 데이터 탐색")
     
@@ -67,6 +72,7 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
             x="검색어",
             y="수집건수",
             color="검색어",
+            color_discrete_sequence=CHART_COLORS,
             text="수집건수",
             title=f"검색어별 {category_name} 데이터 수집량",
             template="plotly_white"
@@ -90,7 +96,7 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
             x="검색어",
             y="건수",
             color="감성",
-            color_discrete_map={"긍정": "#2ecc71", "부정": "#e74c3c", "중립": "#95a5a6"},
+            color_discrete_map={"긍정": "#5F9271", "부정": "#B97870", "중립": "#8798A5"},
             title=f"{category_name} 검색어별 감성 분포",
             barmode="stack",
             template="plotly_white"
@@ -113,6 +119,7 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
             df_cat,
             x="전체_글자수",
             color="검색어",
+            color_discrete_sequence=CHART_COLORS,
             marginal="box",
             nbins=30,
             title=f"{category_name} 텍스트(제목+내용) 글자수 분포",
@@ -140,6 +147,7 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
             x="빈도",
             y="단어",
             orientation="h",
+            color_discrete_sequence=CHART_COLORS,
             text="빈도",
             title=f"{category_name} 전체 주요 출현 단어 Top 15",
             template="plotly_white"
@@ -164,6 +172,7 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
         x="출처_도메인",
         y="게시물수",
         color="출처_도메인",
+        color_discrete_sequence=CHART_COLORS,
         text="게시물수",
         title=f"{category_name} 게시물 출처 도메인 상위 10개",
         template="plotly_white"

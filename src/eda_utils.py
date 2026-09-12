@@ -3,6 +3,7 @@ from collections import Counter
 import pandas as pd
 from urllib.parse import urlparse
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from wordcloud import WordCloud
 
 # 한국어 폰트 설정
@@ -16,6 +17,11 @@ STOPWORDS = set([
 
 POSITIVE_WORDS = set(["추천", "좋은", "최고", "혁신", "성장", "상승", "우수", "혜택", "인기", "강추", "성공", "만족", "발전", "유용", "쉬운", "편리"])
 NEGATIVE_WORDS = set(["문제", "우려", "하락", "위험", "손실", "부족", "어려운", "불만", "피해", "비판", "오류", "경고", "논란", "감소", "부담"])
+
+NAVER_MUTED_CMAP = LinearSegmentedColormap.from_list(
+    "naver_muted",
+    ["#DCE6DB", "#A8BEA3", "#759685", "#527A5D", "#667F8F"],
+)
 
 def extract_tokens(text_list, custom_stopwords=None):
     full_text = " ".join([str(t) for t in text_list if pd.notna(t)])
@@ -40,7 +46,8 @@ def generate_wordcloud(word_counts):
             background_color="white",
             width=800,
             height=400,
-            max_words=100
+            max_words=100,
+            colormap=NAVER_MUTED_CMAP,
         ).generate_from_frequencies(word_counts)
         return wc
     except Exception:
@@ -48,7 +55,8 @@ def generate_wordcloud(word_counts):
             background_color="white",
             width=800,
             height=400,
-            max_words=100
+            max_words=100,
+            colormap=NAVER_MUTED_CMAP,
         ).generate_from_frequencies(word_counts)
         return wc
 
