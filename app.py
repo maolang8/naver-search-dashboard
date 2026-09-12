@@ -234,16 +234,15 @@ with st.sidebar:
     st.header("검색 분석 설정")
     
     # 1. API 키 상태 확인 및 설정
-    st.subheader("1. API 키 상태 (.env 파일)")
+    st.subheader("1. API 연결 상태")
     load_dotenv(override=True)
     env_client_id = os.getenv("NAVER_CLIENT_ID", "").strip()
     env_client_secret = os.getenv("NAVER_CLIENT_SECRET", "").strip()
     
     if env_client_id and env_client_secret and env_client_id != "your_naver_client_id_here":
-        st.success("✅ .env API Key 감지됨")
-        st.caption(f"Client ID: `{env_client_id[:4]}******`")
+        st.success("✅ API 인증 정보가 안전하게 연결되었습니다.")
     else:
-        st.warning("⚠️ .env 파일에 올바른 API Key를 입력해 주세요.")
+        st.warning("⚠️ 환경변수에 API 인증 정보를 설정해 주세요.")
         
     st.divider()
     
@@ -319,7 +318,7 @@ if btn_fetch:
     elif not selected_categories:
         st.error("최소 1개 이상의 수집 카테고리를 선택해주세요.")
     elif not os.getenv("NAVER_CLIENT_ID") or not os.getenv("NAVER_CLIENT_SECRET"):
-        st.error("유효한 네이버 클라우드 API Client ID와 Secret을 .env 파일에 입력해주세요.")
+        st.error("유효한 네이버 클라우드 API 인증 정보를 환경변수에 설정해주세요.")
     else:
         with st.spinner("네이버 클라우드 API에서 데이터를 수집하고 EDA 통계를 계산 중입니다..."):
             # 1. 데이터랩 트렌드 수집

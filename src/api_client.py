@@ -32,7 +32,7 @@ def fetch_naver_search(keyword, category="news", display=100, start=1, sort="sim
     client_secret = os.getenv("NAVER_CLIENT_SECRET", NAVER_CLIENT_SECRET)
     
     if not client_id or not client_secret or client_id == "your_naver_client_id_here":
-        raise ValueError("네이버 클라우드 API Key가 .env 파일에 올바르게 설정되지 않았습니다.")
+        raise ValueError("네이버 클라우드 API 인증 정보가 환경변수에 설정되지 않았습니다.")
         
     # NCloud Naver API Hub 검색 Endpoint
     url = f"https://naverapihub.apigw.ntruss.com/search/v1/{category}"
@@ -89,7 +89,7 @@ def fetch_datalab_trend(keywords, start_date, end_date, time_unit="date", device
     client_secret = os.getenv("NAVER_CLIENT_SECRET", NAVER_CLIENT_SECRET)
     
     if not client_id or not client_secret or client_id == "your_naver_client_id_here":
-        raise ValueError("네이버 클라우드 API Key가 .env 파일에 올바르게 설정되지 않았습니다.")
+        raise ValueError("네이버 클라우드 API 인증 정보가 환경변수에 설정되지 않았습니다.")
         
     url = "https://naverapihub.apigw.ntruss.com/search-trend/v1/search"
     headers = {
