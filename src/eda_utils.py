@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from collections import Counter
 import pandas as pd
 from urllib.parse import urlparse
@@ -39,10 +40,10 @@ def extract_tokens(text_list, custom_stopwords=None):
 def generate_wordcloud(word_counts):
     if not word_counts:
         return None
-    font_path = "C:/Windows/Fonts/malgun.ttf"
+    font_path = Path(__file__).resolve().parent.parent / "assets" / "fonts" / "NotoSansKR.ttf"
     try:
         wc = WordCloud(
-            font_path=font_path,
+            font_path=str(font_path),
             background_color="white",
             width=800,
             height=400,
@@ -51,7 +52,10 @@ def generate_wordcloud(word_counts):
         ).generate_from_frequencies(word_counts)
         return wc
     except Exception:
+        # 개발 PC에서는 시스템 폰트를 최후 대안으로 사용합니다.
+        system_font = "C:/Windows/Fonts/malgun.ttf"
         wc = WordCloud(
+            font_path=system_font if Path(system_font).exists() else None,
             background_color="white",
             width=800,
             height=400,

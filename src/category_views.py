@@ -97,10 +97,12 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
             y="건수",
             color="감성",
             color_discrete_map={"긍정": "#5F9271", "부정": "#B97870", "중립": "#8798A5"},
-            title=f"{category_name} 검색어별 감성 분포",
+            title=f"{category_name} 검색어별 감성 구성비",
             barmode="stack",
+            barnorm="percent",
             template="plotly_white"
         )
+        fig2.update_yaxes(title="감성 구성비 (%)", ticksuffix="%")
         st.plotly_chart(fig2, width="stretch")
         with st.expander("📋 Chart 2 수치 데이터표 및 CSV 다운로드"):
             st.dataframe(sent_counts, width="stretch")
@@ -114,15 +116,15 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
 
     with c2:
         # Chart 3: 텍스트 글자수 분포 히스토그램 (Histogram)
-        st.markdown("**Chart 3. 검색어별 텍스트 글자수 분포 (Histogram)**")
-        fig3 = px.histogram(
+        st.markdown("**Chart 3. 검색어별 콘텐츠 정보량 비교 (Box Plot)**")
+        fig3 = px.box(
             df_cat,
-            x="전체_글자수",
+            x="검색어",
+            y="전체_글자수",
             color="검색어",
             color_discrete_sequence=CHART_COLORS,
-            marginal="box",
-            nbins=30,
-            title=f"{category_name} 텍스트(제목+내용) 글자수 분포",
+            points="outliers",
+            title=f"{category_name} 검색어별 콘텐츠 정보량",
             template="plotly_white"
         )
         st.plotly_chart(fig3, width="stretch")
@@ -167,15 +169,21 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
     # Chart 5: 출처 도메인/플랫폼 Top 10 분포 차트 (Top Domain Distribution)
     st.markdown("**Chart 5. 주요 출처 도메인/플랫폼 분포 Top 10 (Bar Chart)**")
     domain_df = df_cat.groupby("출처_도메인").size().reset_index(name="게시물수").sort_values(by="게시물수", ascending=False).head(10)
-    fig5 = px.bar(
-        domain_df,
-        x="출처_도메인",
-        y="게시물수",
-        color="출처_도메인",
-        color_discrete_sequence=CHART_COLORS,
-        text="게시물수",
-        title=f"{category_name} 게시물 출처 도메인 상위 10개",
-        template="plotly_white"
+    domain_df["누적점유율"] = (domain_df["게시물수"].cumsum() / domain_df["게시물수"].sum() * 100).round(1)
+    fig5 = go.Figure()
+    fig5.add_bar(
+        x=domain_df["출처_도메인"], y=domain_df["게시물수"],
+        name="게시물 수", marker_color="#759685", text=domain_df["게시물수"]
+    )
+    fig5.add_scatter(
+        x=domain_df["출처_도메인"], y=domain_df["누적점유율"],
+        name="누적 점유율", mode="lines+markers", marker_color="#667F8F", yaxis="y2"
+    )
+    fig5.update_layout(
+        title=f"{category_name} 출처 집중도 (Pareto)", template="plotly_white",
+        yaxis=dict(title="게시물 수"),
+        yaxis2=dict(title="누적 점유율 (%)", overlaying="y", side="right", range=[0, 105]),
+        legend=dict(orientation="h", y=1.1)
     )
     st.plotly_chart(fig5, width="stretch")
     with st.expander("📋 Chart 5 수치 데이터표 및 CSV 다운로드"):

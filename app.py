@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 # 소스 모듈 불러오기
 from src.api_client import fetch_naver_search, fetch_datalab_trend, CATEGORY_MAP
 from src.category_views import render_category_eda
-from src.eda_utils import generate_summary_report
+from src.eda_utils import generate_summary_report, analyze_sentiment
 
 load_dotenv()
 
@@ -434,25 +434,83 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
                 y="수집건수",
                 color="검색어",
                 color_discrete_sequence=NAVER_CHART_COLORS,
-                barmode="group",
-                title="카테고리 및 검색어별 데이터 수집 건수",
+                barmode="stack",
+                barnorm="percent",
+                title="카테고리별 검색어 콘텐츠 구성비",
                 template="plotly_white"
             )
+            fig_ov1.update_yaxes(title="구성비 (%)", ticksuffix="%")
             st.plotly_chart(fig_ov1, use_container_width=True)
             
         with c_overall2:
-            counts_kw = combined_df.groupby("검색어").size().reset_index(name="총 수집건수")
-            fig_ov2 = px.bar(
-                counts_kw,
-                x="검색어",
-                y="총 수집건수",
-                color="검색어",
-                color_discrete_sequence=NAVER_CHART_COLORS,
-                text="총 수집건수",
-                title="검색어별 총 데이터 수집량 비교 (Bar Chart)",
-                template="plotly_white"
-            )
+            if not trend_df.empty:
+                interest_kw = trend_df.groupby("검색어", as_index=False)["상대적 검색량"].mean()
+                interest_kw["평균 관심도"] = interest_kw["상대적 검색량"].round(1)
+                fig_ov2 = px.bar(
+                    interest_kw,
+                    x="검색어",
+                    y="평균 관심도",
+                    color="검색어",
+                    color_discrete_sequence=NAVER_CHART_COLORS,
+                    text="평균 관심도",
+                    title="검색어별 기간 평균 관심도",
+                    template="plotly_white"
+                )
+            else:
+                counts_kw = combined_df.groupby("검색어").size().reset_index(name="총 수집건수")
+                fig_ov2 = px.bar(
+                    counts_kw, x="검색어", y="총 수집건수", color="검색어",
+                    color_discrete_sequence=NAVER_CHART_COLORS,
+                    text="총 수집건수", title="검색어별 확보 콘텐츠", template="plotly_white"
+                )
             st.plotly_chart(fig_ov2, use_container_width=True)
+
+        st.subheader("채널별 수집 결과 비교")
+        channel_df = combined_df.copy()
+        channel_df["콘텐츠 글자수"] = (
+            channel_df["제목"].fillna("").astype(str).str.len()
+            + channel_df["요약/내용"].fillna("").astype(str).str.len()
+        )
+        channel_df["감성"] = channel_df["요약/내용"].fillna("").apply(analyze_sentiment)
+
+        channel_volume = channel_df.groupby("카테고리명", as_index=False).size()
+        channel_volume.columns = ["채널", "수집 결과"]
+        channel_depth = (
+            channel_df.groupby("카테고리명", as_index=False)["콘텐츠 글자수"].mean()
+            .rename(columns={"카테고리명": "채널", "콘텐츠 글자수": "평균 글자수"})
+        )
+        channel_depth["평균 글자수"] = channel_depth["평균 글자수"].round(0)
+        channel_sentiment = channel_df.groupby(["카테고리명", "감성"]).size().reset_index(name="건수")
+
+        channel_col1, channel_col2, channel_col3 = st.columns(3)
+        with channel_col1:
+            fig_channel_volume = px.bar(
+                channel_volume, x="채널", y="수집 결과", color="채널", text="수집 결과",
+                color_discrete_sequence=NAVER_CHART_COLORS,
+                title="채널별 확보 콘텐츠", template="plotly_white"
+            )
+            fig_channel_volume.update_layout(showlegend=False)
+            st.plotly_chart(fig_channel_volume, use_container_width=True)
+
+        with channel_col2:
+            fig_channel_depth = px.bar(
+                channel_depth, x="채널", y="평균 글자수", color="채널", text="평균 글자수",
+                color_discrete_sequence=NAVER_CHART_COLORS,
+                title="채널별 평균 콘텐츠 정보량", template="plotly_white"
+            )
+            fig_channel_depth.update_layout(showlegend=False)
+            st.plotly_chart(fig_channel_depth, use_container_width=True)
+
+        with channel_col3:
+            fig_channel_sentiment = px.bar(
+                channel_sentiment, x="카테고리명", y="건수", color="감성",
+                color_discrete_map={"긍정": "#5F9271", "부정": "#B97870", "중립": "#8798A5"},
+                barmode="stack", barnorm="percent",
+                title="채널별 감성 구성비", template="plotly_white"
+            )
+            fig_channel_sentiment.update_yaxes(title="구성비 (%)", ticksuffix="%")
+            fig_channel_sentiment.update_xaxes(title="채널")
+            st.plotly_chart(fig_channel_sentiment, use_container_width=True)
 
     # ---------------------------------------------------------
     # TAB 1~N: 선택한 카테고리별 세부 EDA 페이지 렌더링
