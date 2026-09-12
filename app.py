@@ -23,28 +23,199 @@ st.set_page_config(
 # Custom CSS
 st.markdown("""
 <style>
-    .main-title {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #03C75A;
-        margin-bottom: 0.2rem;
+    :root {
+        --naver-green: #03C75A;
+        --naver-green-dark: #00A84D;
+        --naver-mint: #EAF9F0;
+        --ink: #121212;
+        --muted: #66706A;
+        --line: #E2E8E4;
+        --surface: #FFFFFF;
     }
-    .sub-title {
-        font-size: 1.05rem;
-        color: #555555;
+
+    .stApp {
+        background: #F5F7F6;
+        color: var(--ink);
+    }
+    [data-testid="stHeader"] {
+        background: rgba(245, 247, 246, 0.88);
+        backdrop-filter: blur(10px);
+    }
+    [data-testid="stMainBlockContainer"] {
+        max-width: 1480px;
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+    [data-testid="stSidebar"] {
+        background: #FFFFFF;
+        border-right: 1px solid var(--line);
+    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+        color: var(--ink);
+        letter-spacing: -0.03em;
+    }
+
+    .naver-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 2.1rem 2.35rem 2rem;
         margin-bottom: 1.5rem;
+        border: 1px solid #DDE5E0;
+        border-left: 6px solid var(--naver-green);
+        border-radius: 18px;
+        background: linear-gradient(120deg, #FFFFFF 58%, #E9FFF1 100%);
+        box-shadow: 0 10px 32px rgba(19, 60, 38, 0.06);
+    }
+    .naver-hero::after {
+        content: "N";
+        position: absolute;
+        right: 2.2rem;
+        top: -2.3rem;
+        color: rgba(3, 199, 90, 0.08);
+        font-size: 10rem;
+        font-weight: 900;
+        line-height: 1;
+    }
+    .hero-eyebrow {
+        color: var(--naver-green-dark);
+        font-size: .73rem;
+        font-weight: 800;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        margin-bottom: .65rem;
+    }
+    .main-title {
+        position: relative;
+        z-index: 1;
+        font-size: clamp(1.75rem, 3vw, 2.55rem);
+        line-height: 1.18;
+        font-weight: 850;
+        letter-spacing: -0.055em;
+        color: var(--ink);
+        margin: 0;
+    }
+    .main-title .accent { color: var(--naver-green-dark); }
+    .sub-title {
+        position: relative;
+        z-index: 1;
+        font-size: .98rem;
+        color: var(--muted);
+        margin-top: .7rem;
+        margin-bottom: 0;
+    }
+    .hero-tags {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .45rem;
+        margin-top: 1.2rem;
+    }
+    .hero-tag {
+        padding: .36rem .68rem;
+        border: 1px solid #CDEDD9;
+        border-radius: 999px;
+        background: rgba(255,255,255,.76);
+        color: #247345;
+        font-size: .76rem;
+        font-weight: 650;
+    }
+
+    .stButton > button[kind="primary"] {
+        border: 0;
+        border-radius: 10px;
+        background: var(--naver-green) !important;
+        color: white !important;
+        font-weight: 750;
+        box-shadow: 0 6px 16px rgba(3, 199, 90, .2);
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: var(--naver-green-dark) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 9px 22px rgba(3, 199, 90, .26);
+    }
+    [data-baseweb="input"] > div,
+    [data-baseweb="select"] > div,
+    [data-testid="stDateInput"] [data-baseweb="input"] > div {
+        border-color: #D9E1DC !important;
+        border-radius: 9px !important;
+        background: #FAFBFA !important;
+    }
+    [data-baseweb="input"] > div:focus-within,
+    [data-baseweb="select"] > div:focus-within {
+        border-color: var(--naver-green) !important;
+        box-shadow: 0 0 0 1px var(--naver-green) !important;
+    }
+    [data-testid="stMetric"] {
+        padding: 1.05rem 1.15rem;
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--naver-green);
+        border-radius: 12px;
+        background: var(--surface);
+        box-shadow: 0 5px 18px rgba(27, 45, 35, .04);
+    }
+    [data-testid="stMetricLabel"] { color: var(--muted); }
+    [data-testid="stMetricValue"] { color: var(--ink); font-weight: 800; }
+    .stTabs [data-baseweb="tab-list"] {
+        gap: .25rem;
+        padding: .3rem;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: white;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 2.55rem;
+        border-radius: 8px;
+        color: #59635D;
+        font-weight: 650;
+    }
+    .stTabs [aria-selected="true"] {
+        background: var(--naver-mint);
+        color: var(--naver-green-dark) !important;
+    }
+    .stTabs [data-baseweb="tab-highlight"] { background: var(--naver-green); }
+    [data-testid="stPlotlyChart"], [data-testid="stDataFrame"] {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+        box-shadow: 0 6px 20px rgba(27, 45, 35, .04);
+    }
+    hr { border-color: var(--line) !important; }
+    h1, h2, h3 { letter-spacing: -0.035em !important; }
+    a { color: var(--naver-green-dark); }
+
+    @media (max-width: 700px) {
+        [data-testid="stMainBlockContainer"] { padding-top: 1rem; }
+        .naver-hero { padding: 1.5rem 1.25rem; border-radius: 14px; }
+        .naver-hero::after { display: none; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">📈 네이버 마켓 인사이트 EDA 대시보드</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">네이버 클라우드 API HUB 기반 실시간 마켓 인사이트 탐색적 데이터 분석 (EDA)</div>', unsafe_allow_html=True)
+st.markdown("""
+<section class="naver-hero">
+    <div class="hero-eyebrow">NAVER DATA INSIGHT</div>
+    <h1 class="main-title">검색 데이터를 <span class="accent">인사이트</span>로</h1>
+    <p class="sub-title">네이버 검색·트렌드 데이터를 한곳에서 수집하고, 비교하고, 해석합니다.</p>
+    <div class="hero-tags">
+        <span class="hero-tag">실시간 API</span>
+        <span class="hero-tag">검색 트렌드</span>
+        <span class="hero-tag">콘텐츠 분석</span>
+        <span class="hero-tag">EDA 리포트</span>
+    </div>
+</section>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # 사이드바 설정 영역
 # ---------------------------------------------------------
 with st.sidebar:
-    st.header("⚙️ 검색 & 데이터 수집 설정")
+    st.caption("NAVER SEARCH ANALYTICS")
+    st.header("검색 분석 설정")
     
     # 1. API 키 상태 확인 및 설정
     st.subheader("1. API 키 상태 (.env 파일)")
