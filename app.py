@@ -140,13 +140,14 @@ st.markdown("""
     [data-baseweb="input"] > div,
     [data-baseweb="select"] > div,
     [data-testid="stDateInput"] [data-baseweb="input"] > div {
-        border-color: #D9E1DC !important;
+        border: 1px solid #C9D3CD !important;
         border-radius: 9px !important;
         background: #FAFBFA !important;
+        box-shadow: inset 0 0 0 1px rgba(18, 18, 18, .015) !important;
     }
     [data-baseweb="input"] > div:focus-within,
     [data-baseweb="select"] > div:focus-within {
-        border-color: var(--naver-green) !important;
+        border: 1px solid var(--naver-green) !important;
         box-shadow: 0 0 0 1px var(--naver-green) !important;
     }
     [data-testid="stMetric"] {
@@ -183,6 +184,21 @@ st.markdown("""
         border-radius: 14px;
         background: white;
         box-shadow: 0 6px 20px rgba(27, 45, 35, .04);
+    }
+    [data-testid="stExpander"],
+    [data-testid="stAlert"],
+    [data-testid="stForm"],
+    [data-testid="stFileUploaderDropzone"] {
+        border: 1px solid #D3DDD7 !important;
+        border-radius: 11px !important;
+        background: var(--surface);
+    }
+    [data-testid="stMetric"],
+    [data-testid="stPlotlyChart"],
+    [data-testid="stDataFrame"],
+    [data-testid="stExpander"] {
+        outline: 1px solid rgba(18, 18, 18, .015);
+        outline-offset: -2px;
     }
     hr { border-color: var(--line) !important; }
     h1, h2, h3 { letter-spacing: -0.035em !important; }
