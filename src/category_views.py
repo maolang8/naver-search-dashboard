@@ -99,9 +99,9 @@ def render_category_eda(df_cat, category_name, min_len=0, custom_stopwords=None)
             color_discrete_map={"긍정": "#5F9271", "부정": "#B97870", "중립": "#8798A5"},
             title=f"{category_name} 검색어별 감성 구성비",
             barmode="stack",
-            barnorm="percent",
             template="plotly_white"
         )
+        fig2.update_layout(barnorm="percent")
         fig2.update_yaxes(title="감성 구성비 (%)", ticksuffix="%")
         st.plotly_chart(fig2, width="stretch")
         with st.expander("📋 Chart 2 수치 데이터표 및 CSV 다운로드"):

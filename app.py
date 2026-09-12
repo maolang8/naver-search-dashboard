@@ -435,10 +435,10 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
                 color="검색어",
                 color_discrete_sequence=NAVER_CHART_COLORS,
                 barmode="stack",
-                barnorm="percent",
                 title="카테고리별 검색어 콘텐츠 구성비",
                 template="plotly_white"
             )
+            fig_ov1.update_layout(barnorm="percent")
             fig_ov1.update_yaxes(title="구성비 (%)", ticksuffix="%")
             st.plotly_chart(fig_ov1, use_container_width=True)
             
@@ -505,9 +505,10 @@ if "combined_df" in st.session_state and not st.session_state["combined_df"].emp
             fig_channel_sentiment = px.bar(
                 channel_sentiment, x="카테고리명", y="건수", color="감성",
                 color_discrete_map={"긍정": "#5F9271", "부정": "#B97870", "중립": "#8798A5"},
-                barmode="stack", barnorm="percent",
+                barmode="stack",
                 title="채널별 감성 구성비", template="plotly_white"
             )
+            fig_channel_sentiment.update_layout(barnorm="percent")
             fig_channel_sentiment.update_yaxes(title="구성비 (%)", ticksuffix="%")
             fig_channel_sentiment.update_xaxes(title="채널")
             st.plotly_chart(fig_channel_sentiment, use_container_width=True)
