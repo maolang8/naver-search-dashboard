@@ -137,18 +137,34 @@ st.markdown("""
         transform: translateY(-1px);
         box-shadow: 0 9px 22px rgba(3, 199, 90, .26);
     }
-    [data-baseweb="input"] > div,
-    [data-baseweb="select"] > div,
-    [data-testid="stDateInput"] [data-baseweb="input"] > div {
-        border: 1px solid #C9D3CD !important;
-        border-radius: 9px !important;
-        background: #FAFBFA !important;
-        box-shadow: inset 0 0 0 1px rgba(18, 18, 18, .015) !important;
-    }
-    [data-baseweb="input"] > div:focus-within,
-    [data-baseweb="select"] > div:focus-within {
+    div[data-baseweb="input"],
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="textarea"] {
         border: 1px solid var(--naver-green) !important;
-        box-shadow: 0 0 0 1px var(--naver-green) !important;
+        border-radius: 9px !important;
+        background: #FFFFFF !important;
+        box-shadow: 0 0 0 1px rgba(3, 199, 90, .08) !important;
+    }
+    div[data-baseweb="input"]:hover,
+    div[data-baseweb="select"] > div:hover,
+    div[data-baseweb="textarea"]:hover,
+    div[data-baseweb="input"]:focus-within,
+    div[data-baseweb="select"] > div:focus-within,
+    div[data-baseweb="textarea"]:focus-within {
+        border: 1px solid var(--naver-green) !important;
+        box-shadow: 0 0 0 2px rgba(3, 199, 90, .18) !important;
+    }
+    span[data-baseweb="tag"] {
+        border: 1px solid var(--naver-green-dark) !important;
+        border-radius: 8px !important;
+        background: var(--naver-green) !important;
+        color: #FFFFFF !important;
+        font-weight: 700;
+    }
+    span[data-baseweb="tag"] span,
+    span[data-baseweb="tag"] svg {
+        color: #FFFFFF !important;
+        fill: #FFFFFF !important;
     }
     [data-testid="stMetric"] {
         padding: 1.05rem 1.15rem;
@@ -246,10 +262,15 @@ with st.sidebar:
         
     st.divider()
     
-    # 2. 검색어 입력 (쉼표 구분)
+    # 2. 검색어 입력 (태그형 직접 입력)
     st.subheader("2. 다중 검색어 입력")
-    raw_keywords = st.text_input("검색어 (쉼표 `,` 구분)", value="인공지능, 빅데이터, 클라우드")
-    keywords_list = [k.strip() for k in raw_keywords.split(",") if k.strip()]
+    keywords_list = st.multiselect(
+        "검색어 (입력 후 Enter)",
+        options=["인공지능", "빅데이터", "클라우드"],
+        default=["인공지능", "빅데이터", "클라우드"],
+        placeholder="검색어를 입력하고 Enter를 누르세요",
+        accept_new_options=True,
+    )
     
     st.divider()
     
