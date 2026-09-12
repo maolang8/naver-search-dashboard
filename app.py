@@ -59,24 +59,12 @@ st.markdown("""
 
     .naver-hero {
         position: relative;
-        overflow: hidden;
-        padding: 2.1rem 2.35rem 2rem;
+        padding: 1rem 0 1.35rem;
         margin-bottom: 1.5rem;
-        border: 1px solid #DDE5E0;
-        border-left: 6px solid var(--naver-green);
-        border-radius: 18px;
-        background: linear-gradient(120deg, #FFFFFF 58%, #E9FFF1 100%);
-        box-shadow: 0 10px 32px rgba(19, 60, 38, 0.06);
-    }
-    .naver-hero::after {
-        content: "N";
-        position: absolute;
-        right: 2.2rem;
-        top: -2.3rem;
-        color: rgba(3, 199, 90, 0.08);
-        font-size: 10rem;
-        font-weight: 900;
-        line-height: 1;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
     }
     .hero-eyebrow {
         color: var(--naver-green-dark);
@@ -222,8 +210,7 @@ st.markdown("""
 
     @media (max-width: 700px) {
         [data-testid="stMainBlockContainer"] { padding-top: 1rem; }
-        .naver-hero { padding: 1.5rem 1.25rem; border-radius: 14px; }
-        .naver-hero::after { display: none; }
+        .naver-hero { padding: .75rem 0 1rem; }
     }
 </style>
 """, unsafe_allow_html=True)
